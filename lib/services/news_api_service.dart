@@ -16,7 +16,7 @@ class ApiException implements Exception {
 /// Service class for handling news API requests using HTTP
 class NewsApiService {
   static const String _baseUrl = 'https://newsapi.org/v2';
-  static const String _apiKey = 'bcddd3f3cb8b442484592ae75cfb7a04';
+  static const String _apiKey = 'API_KEY';
   final http.Client _client;
   
   NewsApiService({http.Client? client}) : _client = client ?? http.Client();
