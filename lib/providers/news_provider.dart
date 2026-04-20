@@ -62,8 +62,45 @@ class NewsProvider extends ChangeNotifier {
   /// Set error state with message
   void _setError(String message) {
     _state = NewsState.error;
-    _errorMessage = message;
+    _errorMessage = _getFriendlyErrorMessage(message);
     notifyListeners();
+  }
+
+  /// Convert technical error messages to user-friendly ones
+  String _getFriendlyErrorMessage(String technicalMessage) {
+    // Check for common network-related errors
+    if (technicalMessage.toLowerCase().contains('no internet') ||
+        technicalMessage.toLowerCase().contains('network') ||
+        technicalMessage.toLowerCase().contains('connection') ||
+        technicalMessage.toLowerCase().contains('host') ||
+        technicalMessage.toLowerCase().contains('unreachable') ||
+        technicalMessage.toLowerCase().contains('timeout') ||
+        technicalMessage.toLowerCase().contains('socket')) {
+      return 'No internet connection. Please check your network settings and try again.';
+    }
+    
+    // Check for HTTP status codes
+    if (technicalMessage.contains('404')) {
+      return 'The requested content was not found. Please try again later.';
+    }
+    if (technicalMessage.contains('500') || technicalMessage.contains('502') || technicalMessage.contains('503')) {
+      return 'Server is temporarily unavailable. Please try again in a few minutes.';
+    }
+    if (technicalMessage.contains('401') || technicalMessage.contains('403')) {
+      return 'Access denied. Please check your API credentials.';
+    }
+    if (technicalMessage.contains('429')) {
+      return 'Too many requests. Please wait a moment and try again.';
+    }
+    
+    // Check for API-specific errors
+    if (technicalMessage.toLowerCase().contains('api') && 
+        technicalMessage.toLowerCase().contains('key')) {
+      return 'API authentication failed. Please check your API key.';
+    }
+    
+    // Default user-friendly message
+    return 'Unable to load news. Please check your internet connection and try again.';
   }
 
   /// Reset provider to initial state

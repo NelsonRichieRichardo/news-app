@@ -16,7 +16,7 @@ class ApiException implements Exception {
 /// Service class for handling news API requests using HTTP
 class NewsApiService {
   static const String _baseUrl = 'https://newsapi.org/v2';
-  static const String _apiKey = 'API_KEY';
+  static const String _apiKey = 'bcddd3f3cb8b442484592ae75cfb7a04';
   final http.Client _client;
   
   NewsApiService({http.Client? client}) : _client = client ?? http.Client();
@@ -79,6 +79,13 @@ class NewsApiService {
         throw const ApiException('Connection timeout. Please check your internet connection.');
       } else if (e.message.contains('No address associated with hostname') ?? false) {
         throw const ApiException('No internet connection. Please check your network settings.');
+      } else if (e.message.contains('Network is unreachable') ?? false ||
+                 e.message.contains('Host is down') ?? false ||
+                 e.message.contains('Unable to resolve host') ?? false ||
+                 e.message.contains('Name resolution failed') ?? false) {
+        throw const ApiException('No internet connection. Please check your network settings.');
+      } else if (e.message.contains('SocketException') ?? false) {
+        throw const ApiException('Network connection failed. Please check your internet connection.');
       } else {
         throw ApiException('Network error: ${e.message}');
       }

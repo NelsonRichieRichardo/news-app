@@ -17,6 +17,11 @@ class CustomErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Determine if this is an offline error
+    final isOfflineError = message.toLowerCase().contains('no internet') ||
+        message.toLowerCase().contains('network') ||
+        message.toLowerCase().contains('connection');
+    
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -27,20 +32,26 @@ class CustomErrorWidget extends StatelessWidget {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.errorContainer,
+                color: isOfflineError 
+                    ? Theme.of(context).colorScheme.surfaceVariant
+                    : Theme.of(context).colorScheme.errorContainer,
                 borderRadius: BorderRadius.circular(60),
               ),
               child: Icon(
-                icon ?? Icons.error_outline_outlined,
+                icon ?? (isOfflineError ? Icons.wifi_off_outlined : Icons.error_outline_outlined),
                 size: 60,
-                color: Theme.of(context).colorScheme.error,
+                color: isOfflineError 
+                    ? Theme.of(context).colorScheme.onSurfaceVariant
+                    : Theme.of(context).colorScheme.error,
               ),
             ),
             const SizedBox(height: 24),
             Text(
-              'Oops! Something went wrong',
+              isOfflineError ? 'No Internet Connection' : 'Oops! Something went wrong',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: Theme.of(context).colorScheme.error,
+                color: isOfflineError 
+                    ? Theme.of(context).colorScheme.onSurfaceVariant
+                    : Theme.of(context).colorScheme.error,
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
@@ -55,7 +66,9 @@ class CustomErrorWidget extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Please check your internet connection and try again.',
+              isOfflineError 
+                  ? 'Check your internet connection and try again when you\'re back online.'
+                  : 'Please check your internet connection and try again.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
               ),
@@ -65,11 +78,15 @@ class CustomErrorWidget extends StatelessWidget {
               const SizedBox(height: 32),
               ElevatedButton.icon(
                 onPressed: onRetry,
-                icon: const Icon(Icons.refresh),
-                label: Text(retryText ?? 'Try Again'),
+                icon: Icon(isOfflineError ? Icons.refresh : Icons.refresh),
+                label: Text(retryText ?? (isOfflineError ? 'Retry' : 'Try Again')),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                  foregroundColor: Theme.of(context).colorScheme.onError,
+                  backgroundColor: isOfflineError 
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.error,
+                  foregroundColor: isOfflineError 
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Theme.of(context).colorScheme.onError,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
                     vertical: 16,
